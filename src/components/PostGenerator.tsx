@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { ContentPreviewModal } from '@/components/ContentPreviewModal';
 import { 
   Bot, 
   Briefcase, 
@@ -16,7 +17,8 @@ import {
   X,
   Loader2,
   Calendar,
-  Clock
+  Clock,
+  Maximize2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -117,6 +119,7 @@ export const PostGenerator: React.FC<PostGeneratorProps> = ({ posts, onPostCreat
   const [showSchedule, setShowSchedule] = useState(false);
   const [scheduleDate, setScheduleDate] = useState('');
   const [scheduleTime, setScheduleTime] = useState('');
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
   
   const { toast } = useToast();
 
@@ -292,9 +295,22 @@ What's your experience with this? Share your thoughts below! 👇
         <div className="space-y-6">
           {/* Generated Content */}
           <div>
-            <label className="block text-sm font-medium mb-2 text-foreground">
-              Generated Content
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-foreground">
+                Generated Content
+              </label>
+              {generatedContent && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPreviewModal(true)}
+                  className="gap-2"
+                >
+                  <Maximize2 className="w-4 h-4" />
+                  Full View
+                </Button>
+              )}
+            </div>
             <textarea
               value={generatedContent}
               onChange={(e) => setGeneratedContent(e.target.value)}
@@ -400,6 +416,13 @@ What's your experience with this? Share your thoughts below! 👇
           )}
         </div>
       </div>
+
+      {/* Content Preview Modal */}
+      <ContentPreviewModal
+        content={generatedContent}
+        isOpen={showPreviewModal}
+        onClose={() => setShowPreviewModal(false)}
+      />
     </div>
   );
 };
