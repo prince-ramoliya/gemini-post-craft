@@ -40,58 +40,37 @@ interface PostGeneratorProps {
 }
 
 const categories = [
-  { id: 'ai', name: 'AI & Machine Learning', icon: Bot },
-  { id: 'business', name: 'Business Strategy', icon: Briefcase },
-  { id: 'technology', name: 'Technology', icon: Code2 },
-  { id: 'marketing', name: 'Digital Marketing', icon: TrendingUp },
-  { id: 'leadership', name: 'Leadership', icon: Users },
-  { id: 'trends', name: 'Industry Trends', icon: Globe },
-  { id: 'innovation', name: 'Innovation', icon: Lightbulb },
+  { id: 'ai', name: 'AI', icon: Bot },
+  { id: 'programming', name: 'Programming & Development', icon: Code2 },
+  { id: 'webdev', name: 'Web Development', icon: Globe },
+  { id: 'mobile', name: 'Mobile Development', icon: TrendingUp },
+  { id: 'devops', name: 'DevOps & Cloud', icon: Briefcase },
+  { id: 'cybersecurity', name: 'Cybersecurity', icon: Users },
+  { id: 'datascience', name: 'Data Science & Analytics', icon: TrendingUp },
+  { id: 'ux', name: 'UI/UX Design', icon: Lightbulb },
+  { id: 'technews', name: 'Tech News & Trends', icon: Globe },
+  { id: 'architecture', name: 'Software Architecture', icon: Code2 },
+  { id: 'hardware', name: 'Hardware & Systems', icon: Bot },
+  { id: 'itmanagement', name: 'IT Management', icon: Briefcase },
+  { id: 'education', name: 'Tech Education & Learning', icon: Lightbulb },
+  { id: 'startups', name: 'Tech Business & Startups', icon: TrendingUp },
 ];
 
-const topicsByCategory = {
-  ai: [
-    'How AI is Transforming Customer Service',
-    'The Future of AI in Healthcare',
-    'Machine Learning Best Practices for Startups',
-    'Ethical AI Development Guidelines',
-  ],
-  business: [
-    'Building Resilient Business Models',
-    'Remote Work Strategy for 2024',
-    'Scaling Your Startup Effectively',
-    'Digital Transformation ROI',
-  ],
-  technology: [
-    'Cloud Computing Security Trends',
-    'The Rise of Edge Computing',
-    'DevOps Best Practices',
-    'Cybersecurity for Small Businesses',
-  ],
-  marketing: [
-    'Content Marketing ROI Measurement',
-    'Social Media Strategy for B2B',
-    'Email Marketing Automation',
-    'SEO Trends for 2024',
-  ],
-  leadership: [
-    'Building High-Performing Teams',
-    'Leadership in Crisis Management',
-    'Effective Communication Strategies',
-    'Managing Remote Teams',
-  ],
-  trends: [
-    'Sustainability in Business',
-    'The Future of Work',
-    'Digital Banking Revolution',
-    'E-commerce Evolution',
-  ],
-  innovation: [
-    'Design Thinking in Product Development',
-    'Innovation Culture Building',
-    'Disruptive Technology Adoption',
-    'Creative Problem Solving',
-  ],
+const redditUrls = {
+  ai: 'https://www.reddit.com/r/ArtificialIntelligence/top.json?limit=10&t=day',
+  programming: 'https://www.reddit.com/r/programming/top.json?limit=10&t=day',
+  webdev: 'https://www.reddit.com/r/webdev/top.json?limit=10&t=day',
+  mobile: 'https://www.reddit.com/r/androiddev/top.json?limit=10&t=day',
+  devops: 'https://www.reddit.com/r/devops/top.json?limit=10&t=day',
+  cybersecurity: 'https://www.reddit.com/r/cybersecurity/top.json?limit=10&t=day',
+  datascience: 'https://www.reddit.com/r/datascience/top.json?limit=10&t=day',
+  ux: 'https://www.reddit.com/r/userexperience/top.json?limit=10&t=day',
+  technews: 'https://www.reddit.com/r/technology/top.json?limit=10&t=day',
+  architecture: 'https://www.reddit.com/r/softwarearchitecture/top.json?limit=10&t=day',
+  hardware: 'https://www.reddit.com/r/hardware/top.json?limit=10&t=day',
+  itmanagement: 'https://www.reddit.com/r/sysadmin/top.json?limit=10&t=day',
+  education: 'https://www.reddit.com/r/learnprogramming/top.json?limit=10&t=day',
+  startups: 'https://www.reddit.com/r/startups/top.json?limit=10&t=day',
 };
 
 const SkeletonLoader = () => (
@@ -120,19 +99,46 @@ export const PostGenerator: React.FC<PostGeneratorProps> = ({ posts, onPostCreat
   const [scheduleDate, setScheduleDate] = useState('');
   const [scheduleTime, setScheduleTime] = useState('');
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [redditTopics, setRedditTopics] = useState<string[]>([]);
   
   const { toast } = useToast();
 
-  const handleCategorySelect = (categoryId: string) => {
+  const handleCategorySelect = async (categoryId: string) => {
     setSelectedCategory(categoryId);
     setSelectedTitle('');
     setGeneratedContent('');
     setIsLoadingTitles(true);
+    setRedditTopics([]);
     
-    // Simulate loading delay
-    setTimeout(() => {
+    try {
+      const url = redditUrls[categoryId as keyof typeof redditUrls];
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      const topics = data.data.children
+        .slice(0, 5)
+        .map((post: any) => post.data.title)
+        .filter((title: string) => title.length < 100); // Filter out very long titles
+      
+      setRedditTopics(topics);
+    } catch (error) {
+      console.error('Error fetching Reddit topics:', error);
+      toast({
+        title: "Error fetching topics",
+        description: "Using fallback topics instead.",
+        variant: "destructive",
+      });
+      // Fallback topics
+      setRedditTopics([
+        'How to Scale Your Tech Business',
+        'Best Practices for Modern Development',
+        'The Future of Technology Trends',
+        'Building Better User Experiences',
+        'Innovation in the Digital Age'
+      ]);
+    } finally {
       setIsLoadingTitles(false);
-    }, 750);
+    }
   };
 
   const generateContent = async () => {
@@ -149,37 +155,6 @@ export const PostGenerator: React.FC<PostGeneratorProps> = ({ posts, onPostCreat
   };
 
   const generateLinkedInPost = (topic: string) => {
-    return `🔹 INPUT:
-${topic}
-
-🔹 OUTPUT:
-📢 The LinkedIn Content
-${generatePostContent(topic)}
-
-🌟 Viral Potential (1–10 Rating)
-• 8/10 - High engagement potential
-
-💡 Why This Will Go Viral
-• Combines actionable insights with emotional resonance, perfect for tech professionals seeking both strategy and inspiration.
-
-🔍 Relevant Hashtags & Keywords
-#TechLeadership #Innovation #DigitalTransformation #StartupStrategy #TechTrends #SaaS #ProductDevelopment #TechAgency
-
-🖼️ Image Prompt (for 16:9 Landscape Post Design)
-• Clean, modern design with navy (#004BD6) and orange (#FF8828) brand colors
-• Minimal layout featuring key insight from the post as bold typography
-• Subtle tech-inspired geometric patterns or icons
-• Professional, trustworthy aesthetic that reflects Angrio Technologies' expertise
-• Include company branding elements in bottom corner
-
-📞 Company Footer Info:
-Angrio Technologies
-📞 +91 8141067657
-📩 contact@angriotechnologies.com
-🌐 angriotechnologies.com`;
-  };
-
-  const generatePostContent = (topic: string) => {
     const hooks = [
       "The biggest mistake tech leaders make?",
       "Here's what 10 years in tech taught me:",
@@ -319,7 +294,7 @@ What's your take on this approach?`;
             <SkeletonLoader />
           ) : (
             <div className="space-y-4">
-              {topicsByCategory[selectedCategory as keyof typeof topicsByCategory]?.map((title) => (
+              {redditTopics.map((title) => (
                 <button
                   key={title}
                   onClick={() => setSelectedTitle(title)}
