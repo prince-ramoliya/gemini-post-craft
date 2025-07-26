@@ -142,24 +142,68 @@ export const PostGenerator: React.FC<PostGeneratorProps> = ({ posts, onPostCreat
     
     // Simulate AI generation delay
     setTimeout(() => {
-      const content = `🚀 ${selectedTitle}
-
-In today's rapidly evolving digital landscape, this topic has become more crucial than ever. Here's what industry leaders need to know:
-
-✨ Key insights:
-• Innovation drives competitive advantage
-• Strategic implementation is essential
-• Measurable outcomes matter most
-
-💡 The bottom line: Success comes from combining cutting-edge technology with human-centered design principles.
-
-What's your experience with this? Share your thoughts below! 👇
-
-#Innovation #Technology #Business #Leadership #Growth`;
-      
+      const content = generateLinkedInPost(selectedTitle);
       setGeneratedContent(content);
       setIsGenerating(false);
     }, 2000);
+  };
+
+  const generateLinkedInPost = (topic: string) => {
+    return `🔹 INPUT:
+${topic}
+
+🔹 OUTPUT:
+📢 The LinkedIn Content
+${generatePostContent(topic)}
+
+🌟 Viral Potential (1–10 Rating)
+• 8/10 - High engagement potential
+
+💡 Why This Will Go Viral
+• Combines actionable insights with emotional resonance, perfect for tech professionals seeking both strategy and inspiration.
+
+🔍 Relevant Hashtags & Keywords
+#TechLeadership #Innovation #DigitalTransformation #StartupStrategy #TechTrends #SaaS #ProductDevelopment #TechAgency
+
+🖼️ Image Prompt (for 16:9 Landscape Post Design)
+• Clean, modern design with navy (#004BD6) and orange (#FF8828) brand colors
+• Minimal layout featuring key insight from the post as bold typography
+• Subtle tech-inspired geometric patterns or icons
+• Professional, trustworthy aesthetic that reflects Angrio Technologies' expertise
+• Include company branding elements in bottom corner
+
+📞 Company Footer Info:
+Angrio Technologies
+📞 +91 8141067657
+📩 contact@angriotechnologies.com
+🌐 angriotechnologies.com`;
+  };
+
+  const generatePostContent = (topic: string) => {
+    const hooks = [
+      "The biggest mistake tech leaders make?",
+      "Here's what 10 years in tech taught me:",
+      "Most startups fail because of this one thing:",
+      "The reality of scaling a tech business:",
+      "Why traditional approaches don't work anymore:"
+    ];
+    
+    const hook = hooks[Math.floor(Math.random() * hooks.length)];
+    
+    return `${hook}
+
+${topic} isn't just a buzzword—it's reshaping how we build and scale technology businesses.
+
+**The reality:**
+Most companies approach this wrong. They focus on tools over strategy.
+
+**The solution:**
+Start with your users. Build backwards from their actual needs.
+
+**The result:**
+Products that don't just function—they transform businesses.
+
+What's your take on this approach?`;
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
